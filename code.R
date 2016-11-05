@@ -144,15 +144,16 @@ both %>%
                                 stringr::str_pad(lubridate::week(dateLocal),
                                                  width = 2, pad = "0")))) %>%
   group_by(week, location) %>%
-  summarize(
+  summarize(missingness = 1 - n()/168,
     quantile10 = quantile(value, p = 0.1),
     quantile90 = quantile(value, p = 0.9),
     value = mean(value)) %>%
+  mutate(how_complete = 4 * (1-missingness)) %>%
 ggplot() +
   geom_point(aes(week, value, col = location), size = 2) +
   geom_segment(aes(x = week, xend = week,
                    y = quantile10, yend = quantile90,
-                   col = location), size = 4, alpha = 0.5) +
+                   col = location, size = how_complete), alpha = 0.5) +
   scale_color_viridis(discrete = TRUE, end = 0.8) +
   theme(legend.position = "bottom")+
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -160,6 +161,7 @@ ggplot() +
   ylab(expression(paste("PM2.5 concentration (", mu, "g/",m^3,")"))) +
   ggtitle("Air quality in Beijing, China and Delhi, India in the last year",
           subtitle = "Data from the US embassies accessed via their websites & OpenAQ via ropenaq.
-The point is the weekly mean, the segment goes from the 10th to the 90th quantile of all values from the week.")
+The point is the weekly mean, the segment goes from the 10th to the 90th quantile of all values from the week.
+The width of the segment indicates how complete the week is, i.e. how many of the expected 168 values there are.")
 
 ggsave("Beijing_Delhi.png", width = 16, height = 6)
