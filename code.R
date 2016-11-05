@@ -95,10 +95,48 @@ meas_india <- filter(meas_india,
 both <- bind_rows(meas_china, meas_india)
 both <- select(both, dateLocal, city, value, location)
 both <- bind_rows(both, pm25_india)
+
+############################################################
+#                                                          #
+#       Filter what clearly looks like wrong values        ####
+#                                                          #
+############################################################
+
+
 both <- filter(both, value > -999)
 both <- filter(both, value < 1985)
+
+############################################################
+#                                                          #
+#                      last year only                      ####
+#                                                          #
+############################################################
+
+
 both <- filter(both, as.Date(dateLocal) >= lubridate::ymd("2015 11 5"))
 
+############################################################
+#                                                          #
+#                       missingness                        ####
+#                                                          #
+############################################################
+both %>%
+  mutate(week = as.factor(paste(lubridate::year(dateLocal),
+                                stringr::str_pad(lubridate::week(dateLocal),
+                                                 width = 2, pad = "0")))) %>%
+  group_by(week, location) %>%
+  summarize(missingness = 1 - n()/168,
+            quantile10 = quantile(value, p = 0.1),
+            quantile90 = quantile(value, p = 0.9),
+            value = mean(value)) %>%
+  readr::write_csv("weekly_summary.csv")
+    
+
+############################################################
+#                                                          #
+#                          figure                          ####
+#                                                          #
+############################################################
 
 
 both %>%
