@@ -121,6 +121,23 @@ The horizontal line is the WHO guideline of 25 µg/m3 24-hour mean.") +
   geom_hline(yintercept = 25, size = 1.5) +
   xlab("Time (days)")
 ggsave("Delhi.png", width = 8.5, height = 6)
+
+
+
+delhi %>% 
+  filter(lubridate::year(dateLocal) == 2016 & lubridate::month(dateLocal) == 11) %>%
+  group_by(day = as.Date(dateLocal)) %>%
+  summarize(value = mean(value, na.rm = TRUE)) %>%
+  ggplot(aes(day, value)) +
+  geom_line(size = 1.5, col = "darkred")+
+  ylab(expression(paste("PM2.5 concentration (", mu, "g/",m^3,")"))) +
+  ggtitle("Daily average PM2.5 concentration in Delhi, India",
+          subtitle = "Data from the US embassy accessed via their website & OpenAQ.
+The horizontal line is the WHO guideline of 25 µg/m3 24-hour mean.") +
+  theme(text = element_text(size=16)) +
+  geom_hline(yintercept = 25, size = 1.5) +
+  xlab("Time (days)")
+ggsave("Delhi_nov_2016.png", width = 8.5, height = 6)
 ############################################################
 #                                                          #
 #                      last year only                      ####
