@@ -24,7 +24,8 @@ pm25_india <- rename(pm25_india, dateLocal = datetime)
 ############################################################
 
 count_india <- aq_measurements(city = "Delhi", parameter = "pm25",
-                               location = "US+Diplomatic+Post%3A+New+Delhi")
+                               location = "US+Diplomatic+Post%3A+New+Delhi",
+                               date_to = as.character(Sys.Date() - 1))
 count_india <- attr(count_india, "meta")$found
 meas_india <- NULL
 for(page in 1:ceiling(count_india/1000)){
